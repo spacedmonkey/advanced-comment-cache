@@ -12,8 +12,8 @@
  * @wordpress-plugin
  * Plugin Name:        Advanced Comment Cache
  * Plugin URI:         https://www.github.com/spacedmonkey/advanced-comment-cache
- * Description:        Cache wp_comment_query.
- * Version:            1.1.3
+ * Description:        Cache wp_comment_query output in object cache.
+ * Version:            1.0.0
  * Author:             Jonathan Harris
  * Author URI:         http://www.jonathandavidharris.co.uk/
  * License:            GPL-2.0+
@@ -78,10 +78,10 @@ if ( ! class_exists( 'Advanced_Comment_Cache' ) ) {
 			$comment_ids = wp_cache_get( $cache_key, $this->cache_group );
 			if ( false === $comment_ids ) {
 				$this->is_cached = false;
-				remove_filter( 'found_comments_query', '_return_empty_string' );
+				remove_filter( 'found_comments_query', '__return_empty_string' );
 			} else {
 				$this->is_cached = true;
-				add_filter( 'found_comments_query', '_return_empty_string' );
+				add_filter( 'found_comments_query', '__return_empty_string' );
 			}
 
 			if ( is_array( $comment_ids ) ) {
@@ -117,6 +117,7 @@ if ( ! class_exists( 'Advanced_Comment_Cache' ) ) {
 				}
 			}
 
+
 			return $_comments;
 		}
 
@@ -127,9 +128,11 @@ if ( ! class_exists( 'Advanced_Comment_Cache' ) ) {
 			$_comment = wp_cache_get( $id, $this->cache_group );
 			if ( false === $_comment ) {
 				$_comment = get_comment( $id );
-				wp_cache_add( $id, $_comment, $this->cache_group );
 			}
-			wp_cache_add( $id, $_comment, 'comment' );
+			if ( $_comment ) {
+				wp_cache_add( $id, $_comment, $this->cache_group );
+				wp_cache_add( $id, $_comment, 'comment' );
+			}
 		}
 
 
