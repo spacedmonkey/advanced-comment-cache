@@ -59,6 +59,7 @@ if ( ! class_exists( 'Advanced_Comment_Cache' ) ) {
 			add_action( 'pre_get_comments', array( $this, 'pre_get_comments' ) );
 			add_action( 'the_comments', array( $this, 'the_comments' ), 10, 2 );
 			add_action( 'clean_comment_cache', array( $this, 'clean_comment_cache' ) );
+			add_action( 'wp_insert_comment', array( $this, 'wp_insert_comment' ) );
 		}
 
 
@@ -95,6 +96,14 @@ if ( ! class_exists( 'Advanced_Comment_Cache' ) ) {
 				wp_cache_add( $cache_key, $comment_ids, 'comment' );
 				array_map( array( $this, "prime_comment_cache" ), $comment_ids );
 			}
+		}
+
+		/**
+		 * @param $comment_id
+		 */
+		function wp_insert_comment( $comment_id ) {
+			clean_comment_cache( $comment_id );
+			$this->prime_comment_cache( $comment_id );
 		}
 
 		/**
